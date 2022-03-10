@@ -1,11 +1,46 @@
 import math
+import random
+from typing import List
+
 import pyglet
 from pyglet import shapes
 
+class Car:
+    def __init__(self, renderer, acceleration=1.001, max_speed=5, velocity=0.4, number=0):
+        self.old_position = (0, 0)
+        self.new_position = (0, 0)
+        self.velocity = random.random()
+        self.distance = 0
 
-class Map(pyglet.window.Window):
+        self.width = width
+        self.height = height
+        self.acceleration = acceleration
+        self.max_speed = max_speed
+
+        # Random colour car
+        RGB = tuple(int((random.random() * 255)) for _ in range(3))
+        self.car = shapes.Circle(height / 2, width / 2, 10, color=RGB, batch=renderer)
+
+    def update_position(self, time):
+        """
+        Updates new position of car
+        :param dt: difference in time
+        :return:
+        """
+
+        if self.velocity < self.max_speed:
+            self.velocity *= self.acceleration
+
+        # Todo : track model can be a seperate class
+        self.car.position = (self.width / 2 + math.cos(time * self.velocity) * self.height / 3,
+                             self.height / 2 + math.sin(time * self.velocity) * self.height / 3)
+
+
+class Window(pyglet.window.Window, Car):
+    Cars: List[Car]
+
     def __init__(self, width, height):
-        super().__init__(width, height, "Map")
+        super().__init__(width, height, "TrafficSim")
         self.time = 0
         self.batch = pyglet.graphics.Batch()
 
@@ -14,7 +49,7 @@ class Map(pyglet.window.Window):
 
         self.old_position = (0, 0)
         self.new_position = (0, 0)
-        self.velocity = 1
+        self.velocity = 0.5
         self.distance = 0
         self.acceleration = 1.001
 
@@ -43,8 +78,14 @@ class Map(pyglet.window.Window):
 
         # Ideal oval shape has axis ratio of 2/1, minor/major.
         # self.track = shapes.Ellipse(width/2, height/2, 300, 150, color=(122, 133, 122), batch=self.batch, group=None)
+        self.Cars = []
 
-        self.car = shapes.Circle(width / 2, height / 2, 10, color=(255, 170, 170), batch=self.batch, group=None)
+        for i in range(5):
+            self.Cars.append(Car(self.batch, number=i))
+
+        self.car1 = Car(self.batch, max_speed=2, velocity=0.6)
+        self.car2 = Car(self.batch, max_speed=4, velocity=0.4)
+        self.car3 = Car(self.batch, max_speed=10, velocity=0.1)
 
     def on_draw(self):
         self.clear()
@@ -53,31 +94,32 @@ class Map(pyglet.window.Window):
     def update(self, delta_time):
         self.time += delta_time
 
-        if self.velocity < 7:
-            self.velocity *= self.acceleration
-        self.new_position = (self.width / 2 + math.cos(self.time * self.velocity) * self.height / 3,
-                             self.height / 2 + math.sin(self.time * self.velocity) * self.height / 3)
-        self.car.position = self.new_position
+        for car in self.Cars:
+            car.update_position(self.time)
+
+
+        self.car1.update_position(self.time)
+        self.car2.update_position(self.time)
+        self.car3.update_position(self.time)
 
         self.velocity_meter.text = ("Velocity : {:.2f}".format(self.velocity))
 
-        self.distance_step = self.velocity * delta_time
-        self.distance += self.distance_step
-        print("Speed({}) * Time({}) = Distance ({})".format(self.velocity, delta_time, self.distance_step))
-        self.distance_meter.text = ("Distance : {:.2f}".format(self.distance))
-        self.old_position = self.new_position
-
-        self.acceleration_meter.text = ("Acceleration : {:.2f}".format(self.acceleration))
+        # Todo : Update meters
+        # self.distance_step = self.velocity * delta_time
+        # self.distance += self.distance_step
+        # print("Speed({}) * Time({}) = Distance ({})".format(self.velocity, delta_time, self.distance_step))
+        # self.distance_meter.text = ("Distance : {:.2f}".format(self.distance))
+        # self.old_position = self.new_position
+        #
+        # self.acceleration_meter.text = ("Acceleration : {:.2f}".format(self.acceleration))
 
 
 # Distance is speed over time: s = v/t
 # TODO: Implement velocity
 
-class Car:
-    pass
-
-
+height = 800
+width = 600
 if __name__ == "__main__":
-    map = Map(800, 600)
-    pyglet.clock.schedule_interval(map.update, 1 / 120)
+    window = Window(width, height)
+    pyglet.clock.schedule_interval(window.update, 1 / 120)
     pyglet.app.run()
