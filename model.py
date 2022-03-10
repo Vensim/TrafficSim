@@ -36,8 +36,8 @@ class Car:
                              self.height / 2 + math.sin(time * self.velocity) * self.height / 3)
 
 
-class Window(pyglet.window.Window, Car):
-    Cars: List[Car]
+class Window(pyglet.window.Window):
+
 
     def __init__(self, width, height):
         super().__init__(width, height, "TrafficSim")
@@ -47,31 +47,25 @@ class Window(pyglet.window.Window, Car):
         self.width = width
         self.height = height
 
-        self.old_position = (0, 0)
-        self.new_position = (0, 0)
-        self.velocity = 0.5
-        self.distance = 0
-        self.acceleration = 1.001
-
-        self.velocity_meter = pyglet.text.Label('Velocity : {}'.format(int(self.velocity)),
-                                                font_size=10,
-                                                x=self.width / 2,
-                                                y=self.height / 7,
-                                                anchor_x='center',
-                                                anchor_y='center', batch=self.batch)
-        self.distance_meter = pyglet.text.Label('Distance : {}'.format(int(self.distance)),
-                                                font_size=10,
-                                                x=self.width / 2,
-                                                y=self.height / 7 - 11,
-                                                anchor_x='center',
-                                                anchor_y='center', batch=self.batch)
-
-        self.acceleration_meter = pyglet.text.Label('Acceleration : {}'.format(int(self.distance)),
-                                                    font_size=10,
-                                                    x=self.width / 2,
-                                                    y=self.height / 7 - 22,
-                                                    anchor_x='center',
-                                                    anchor_y='center', batch=self.batch)
+        # self.velocity_meter = pyglet.text.Label('Velocity : {}'.format(int(self.velocity)),
+        #                                         font_size=10,
+        #                                         x=self.width / 2,
+        #                                         y=self.height / 7,
+        #                                         anchor_x='center',
+        #                                         anchor_y='center', batch=self.batch)
+        # self.distance_meter = pyglet.text.Label('Distance : {}'.format(int(self.distance)),
+        #                                         font_size=10,
+        #                                         x=self.width / 2,
+        #                                         y=self.height / 7 - 11,
+        #                                         anchor_x='center',
+        #                                         anchor_y='center', batch=self.batch)
+        #
+        # self.acceleration_meter = pyglet.text.Label('Acceleration : {}'.format(int(self.distance)),
+        #                                             font_size=10,
+        #                                             x=self.width / 2,
+        #                                             y=self.height / 7 - 22,
+        #                                             anchor_x='center',
+        #                                             anchor_y='center', batch=self.batch)
 
         self.OuterRim = shapes.Circle(width / 2, height / 2, height / 3, color=(255, 225, 255), batch=self.batch)
         self.InnerRim = shapes.Circle(width / 2, height / 2, height / 3 - 2, color=(0, 0, 0), batch=self.batch)
@@ -80,12 +74,8 @@ class Window(pyglet.window.Window, Car):
         # self.track = shapes.Ellipse(width/2, height/2, 300, 150, color=(122, 133, 122), batch=self.batch, group=None)
         self.Cars = []
 
-        for i in range(5):
+        for i in range(4000):
             self.Cars.append(Car(self.batch, number=i))
-
-        self.car1 = Car(self.batch, max_speed=2, velocity=0.6)
-        self.car2 = Car(self.batch, max_speed=4, velocity=0.4)
-        self.car3 = Car(self.batch, max_speed=10, velocity=0.1)
 
     def on_draw(self):
         self.clear()
@@ -97,12 +87,7 @@ class Window(pyglet.window.Window, Car):
         for car in self.Cars:
             car.update_position(self.time)
 
-
-        self.car1.update_position(self.time)
-        self.car2.update_position(self.time)
-        self.car3.update_position(self.time)
-
-        self.velocity_meter.text = ("Velocity : {:.2f}".format(self.velocity))
+        # self.velocity_meter.text = ("Velocity : {:.2f}".format(self.velocity))
 
         # Todo : Update meters
         # self.distance_step = self.velocity * delta_time
